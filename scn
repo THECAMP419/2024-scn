@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Text</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: flex-start; /* 왼쪽 정렬 */
+            align-items: flex-start; /* 위쪽 정렬 */
+            background-image: url('https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?q=80&w=2672&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* 배경 이미지 URL */
+            background-size: cover; /* 배경 이미지를 화면에 맞게 조정 */
+            background-position: center; /* 이미지 중앙 정렬 */
+        }
+        #textInput {
+            position: absolute; /* 위치를 절대적으로 변경 */
+            top: 20px; /* 위에서 20px 떨어진 위치 */
+            left: 20px; /* 왼쪽에서 20px 떨어진 위치 */
+            padding: 10px;
+            font-size: 18px;
+            z-index: 1000;
+        }
+        .bouncingText {
+            position: absolute;
+            font-size: 30px; /* 기본 글씨 크기 (랜덤 설정됨) */
+            color: #FFFFFF; /* 하얀색 */
+            white-space: nowrap;
+            pointer-events: none;
+            text-shadow: 
+                0 0 1px #FFFFFF,  
+                0 0 2px #FFFFFF,
+                0 0 3px #FFFFFF,
+                0 0 4px #FFFFFF,
+                0 0 5px #FFFFFF,
+                0 0 6px #FFFFFF; 
+        }
+    </style>
+</head>
+<body>
+    <input type="text" id="textInput" placeholder="Type something..." onkeypress="addBouncingText(event)">
+    <script>
+        function addBouncingText(event) {
+            if (event.key === "Enter") {
+                const textValue = document.getElementById("textInput").value;
+                if (textValue.trim() === "") return;
+
+                const bouncingText = document.createElement("div");
+                bouncingText.classList.add("bouncingText");
+                bouncingText.innerText = textValue;
+
+                const randomFontSize = Math.floor(Math.random() * 20) + 20; // 20px에서 40px 사이의 랜덤 크기
+                bouncingText.style.fontSize = `${randomFontSize}px`;
+
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * window.innerHeight;
+
+                let deltaX = (Math.random() * 1 - 0.5); // 속도 조절
+                let deltaY = (Math.random() * 1 - 0.5); // 속도 조절
+                bouncingText.style.left = `${startX}px`;
+                bouncingText.style.top = `${startY}px`;
+
+                document.body.appendChild(bouncingText);
+
+                function moveText() {
+                    const rect = bouncingText.getBoundingClientRect();
+                    if (rect.left <= 0 || rect.right >= window.innerWidth) {
+                        deltaX *= -1;
+                    }
+                    if (rect.top <= 0 || rect.bottom >= window.innerHeight) {
+                        deltaY *= -1;
+                    }
+                    bouncingText.style.left = `${rect.left + deltaX}px`;
+                    bouncingText.style.top = `${rect.top + deltaY}px`;
+
+                    requestAnimationFrame(moveText);
+                }
+
+                moveText();
+                document.getElementById("textInput").value = "";
+
+                // 3분(180,000밀리초) 후 텍스트를 삭제
+                setTimeout(() => {
+                    bouncingText.remove();
+                }, 180000); // 180,000 밀리초 = 3분
+            }
+        }
+    </script>
+</body>
+</html>
